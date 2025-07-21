@@ -1,11 +1,9 @@
-pandas
-pdfplumber
-llama-cpp-python
-python-dotenv
 PyYAML
 jinja2
+llama-cpp-python
 openpyxl
-xlsxwriter
+pandas
+pdfplumber
+python-dotenv
 requests
-streamlit
-streamlit-aggrid
+xlsxwriter
