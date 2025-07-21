@@ -1,0 +1,11 @@
+pandas
+pdfplumber
+llama-cpp-python
+python-dotenv
+PyYAML
+jinja2
+openpyxl
+xlsxwriter
+requests
+streamlit
+streamlit-aggrid
