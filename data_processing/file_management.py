@@ -1,6 +1,7 @@
 """
 data_processing/file_management.py
 """
+
 import os
 import shutil
 import datetime
@@ -69,7 +70,9 @@ def archive_file(file_path: str, account: str, archive_dir: str):
     print(f"[📁] Archived {filename} → {archived_name}")
 
 
-def archive_processed_files(accounts: dict, filepaths_dict: dict, data_dir: str, archive_folder: str):
+def archive_processed_files(
+    accounts: dict, filepaths_dict: dict, data_dir: str, archive_folder: str
+):
     if not archive_folder:
         return
     for account, details in accounts.items():
@@ -79,9 +82,12 @@ def archive_processed_files(accounts: dict, filepaths_dict: dict, data_dir: str,
             archive_file(file, account, archive_directory)
 
 
-def unarchive_processed_folders(archive_dir: str, destination_dir: str, move: bool = True):
+def unarchive_processed_folders(
+    archive_dir: str, destination_dir: str, move: bool = True
+):
     """
-    Move or copy entire folders from `archive_dir` to `destination_dir`.
+    Move or copy entire folders from `archive_dir` to `destination_dir`, and ensure
+    nothing remains in the archive afterwards.
 
     Args:
         archive_dir (str): The archive directory containing folders to restore.
@@ -91,8 +97,7 @@ def unarchive_processed_folders(archive_dir: str, destination_dir: str, move: bo
     if not os.path.exists(archive_dir):
         raise FileNotFoundError(f"Archive directory does not exist: {archive_dir}")
 
-    if not os.path.exists(destination_dir):
-        os.makedirs(destination_dir)
+    os.makedirs(destination_dir, exist_ok=True)
 
     for folder_name in os.listdir(archive_dir):
         src_path = os.path.join(archive_dir, folder_name)
@@ -101,32 +106,63 @@ def unarchive_processed_folders(archive_dir: str, destination_dir: str, move: bo
         if not os.path.isdir(src_path):
             continue  # Skip files
 
-        if not os.path.exists(dest_path):
-            shutil.move(src_path, dest_path)
-            print(f"[📁] Moved {folder_name} → {dest_path}")
-        elif os.path.isdir(dest_path) and not os.listdir(dest_path):
-            # Destination exists but is empty
-            os.rmdir(dest_path)
-            shutil.move(src_path, dest_path)
-            print(f"[♻️] Replaced empty {folder_name} → {dest_path}")
-        else:
-            # Destination exists and has content — copy files into it
-            for item in os.listdir(src_path):
-                src_item = os.path.join(src_path, item)
-                dest_item = os.path.join(dest_path, item)
+        if move:
+            if not os.path.exists(dest_path):
+                shutil.move(src_path, dest_path)
+                print(f"[📁] Moved {folder_name} → {dest_path}")
+            elif os.path.isdir(dest_path) and not os.listdir(dest_path):
+                os.rmdir(dest_path)
+                shutil.move(src_path, dest_path)
+                print(f"[♻️] Replaced empty {folder_name} → {dest_path}")
+            else:
+                # Destination exists and has content — merge then delete
+                for item in os.listdir(src_path):
+                    src_item = os.path.join(src_path, item)
+                    dest_item = os.path.join(dest_path, item)
 
-                if os.path.isdir(src_item):
-                    # Recursively merge subdirectories
-                    if not os.path.exists(dest_item):
-                        shutil.copytree(src_item, dest_item)
+                    if os.path.isdir(src_item):
+                        if not os.path.exists(dest_item):
+                            shutil.copytree(src_item, dest_item)
+                        else:
+                            for root, _, files in os.walk(src_item):
+                                rel_path = os.path.relpath(root, src_path)
+                                target_dir = os.path.join(dest_path, rel_path)
+                                os.makedirs(target_dir, exist_ok=True)
+                                for file in files:
+                                    shutil.copy2(
+                                        os.path.join(root, file),
+                                        os.path.join(target_dir, file),
+                                    )
                     else:
-                        # Merge files from subdir
-                        for root, _, files in os.walk(src_item):
-                            rel_path = os.path.relpath(root, src_path)
-                            target_dir = os.path.join(dest_path, rel_path)
-                            os.makedirs(target_dir, exist_ok=True)
-                            for file in files:
-                                shutil.copy2(os.path.join(root, file), os.path.join(target_dir, file))
-                else:
-                    shutil.copy2(src_item, dest_item)
-            print(f"[📥] Merged contents of {folder_name} → {dest_path}")
+                        shutil.copy2(src_item, dest_item)
+
+                shutil.rmtree(src_path)  # Ensure the archive folder is removed
+                print(f"[📥] Merged and removed {folder_name} from archive")
+        else:
+            # Copy mode: copy entire folder contents, then delete the archive folder
+            if not os.path.exists(dest_path):
+                shutil.copytree(src_path, dest_path)
+                print(f"[📁] Copied {folder_name} → {dest_path}")
+            else:
+                for item in os.listdir(src_path):
+                    src_item = os.path.join(src_path, item)
+                    dest_item = os.path.join(dest_path, item)
+
+                    if os.path.isdir(src_item):
+                        if not os.path.exists(dest_item):
+                            shutil.copytree(src_item, dest_item)
+                        else:
+                            for root, _, files in os.walk(src_item):
+                                rel_path = os.path.relpath(root, src_path)
+                                target_dir = os.path.join(dest_path, rel_path)
+                                os.makedirs(target_dir, exist_ok=True)
+                                for file in files:
+                                    shutil.copy2(
+                                        os.path.join(root, file),
+                                        os.path.join(target_dir, file),
+                                    )
+                    else:
+                        shutil.copy2(src_item, dest_item)
+
+                shutil.rmtree(src_path)
+                print(f"[📥] Copied and removed {folder_name} from archive")

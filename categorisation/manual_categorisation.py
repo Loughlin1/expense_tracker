@@ -8,6 +8,7 @@ import pandas as pd
 
 def apply_categorisation_rules(df: pd.DataFrame, rules: list[dict]) -> pd.Series:
     categories = pd.Series(index=df.index, dtype=object)
+    subcategories = pd.Series(index=df.index, dtype=object)
 
     for rule in rules:
         mask = pd.Series([True] * len(df))
@@ -26,6 +27,7 @@ def apply_categorisation_rules(df: pd.DataFrame, rules: list[dict]) -> pd.Series
                 mask &= df[col] < cond["lt"]
 
         categories[mask] = rule["category"]
+        if "subcategory" in rule:
+            subcategories[mask] = rule["subcategory"]
 
-    return categories
-
+    return pd.DataFrame({"Category": categories, "Subcategory": subcategories})

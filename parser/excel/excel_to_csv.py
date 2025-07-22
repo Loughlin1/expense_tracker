@@ -19,7 +19,7 @@ def clean_df(df):
         "Category",
         "Amount Out",
         "Amount In",
-        "Notes and #tags",
+        "Notes",
         "Account",
         "sheet",
     ]

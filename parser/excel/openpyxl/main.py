@@ -15,6 +15,7 @@ from parser.excel.openpyxl.excel_formatting import (
     resize_columns,
 )
 
+
 def delete_sheet_in_excel_file(filepath: str, sheet_name: str = "MasterData"):
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"{filepath} does not exist.")
@@ -23,12 +24,14 @@ def delete_sheet_in_excel_file(filepath: str, sheet_name: str = "MasterData"):
     if sheet_name in workbook.sheetnames:
         workbook.remove(workbook[sheet_name])
         print(f"Worksheet {sheet_name} removed from {filepath}.")
+    workbook.save(filepath)
 
 
 def update_excel_file(
     df: pd.DataFrame,
     filepath: str,
-    category_list: list,
+    category_list: list[str],
+    subcategory_list: list[str],
     category_colour_map: dict,
     account_colour_map: dict,
 ) -> None:
@@ -83,6 +86,7 @@ def update_excel_file(
         table.ref = new_ref
     else:
         from openpyxl.worksheet.table import Table, TableStyleInfo
+
         table = Table(displayName=table_name, ref=f"A1:{end_col_letter}{end_row}")
         style = TableStyleInfo(name="TableStyleMedium9", showRowStripes=True)
         table.tableStyleInfo = style
@@ -94,6 +98,7 @@ def update_excel_file(
     apply_currency_formatting(ws, ["Amount", "Amount In", "Amount Out"])
     apply_bold_headers(ws)
     resize_columns(ws)
-    add_dropdown(ws, category_list)
+    add_dropdown(ws, category_list, col_name="Category")
+    add_dropdown(ws, subcategory_list, col_name="Subcategory")
 
     workbook.save(filepath)

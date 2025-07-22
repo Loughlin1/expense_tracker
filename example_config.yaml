@@ -1,0 +1,114 @@
+accounts:
+  bank_name1:
+    directory: bank1_statements
+    colour: "D3D3D3"
+    mapping:
+      transaction date: Date
+      transaction type: Type
+      transaction description: Name
+      debit amount: Amount Out
+      credit amount: Amount In
+  bank_name2:
+    directory: bank2_statements
+    colour: "87CEFA"
+    mapping:
+      date: Date
+      time: Time
+      amount: Amount
+      type: Type
+      name: Name
+      money out: Amount Out
+      money in: Amount In
+
+
+output_columns:
+  - Year
+  - Month
+  - Date
+  - Time
+  - Type
+  - Name
+  - Amount
+  - Category
+  - Subcategory
+  - Amount Out
+  - Amount In
+  - Notes
+  - Account
+
+classification_features:
+  - Index
+  - Date
+  - Name
+  - Amount
+  - Notes
+
+
+categories:
+  - name: Transport
+    color: "FF6F61"       # Reddish for fuel, car, bus
+    emoji: "🚌"
+    subcategories:
+      - Public Transport
+      - Taxis
+      - "E-Scooters & Bikes"
+      - Parking
+      - Fuel
+  - name: Housing
+    color: "B0C4DE"       # Light steel blue, calm and stable
+    emoji: "🏠"
+    subcategories:
+      - Rent
+      - Deposit
+  - name: Bills
+    color: "F4A460"       # Sandy brown for paper/utilities
+    emoji: "💡"
+    subcategories:
+      - Utilities
+      - Phone
+  - name: Food
+    emoji: "🍽️"
+    color: "FFA07A"
+    subcategories:
+      - Groceries
+      - Snacks/Drinks
+      - Lunches
+      - Eating Out
+      - Takeaway/FastFood
+  - name: Shopping
+    color: "FF69B4"       # Hot pink — consumer goods
+    emoji: "🛍️"
+    subcategories:
+      - Clothes
+      - Electronics
+      - Home
+      - Other
+  - name: Entertainment
+    emoji: "🎬"
+    color: "9370DB"
+    subcategories:
+      - Cinema
+      - Music
+      - Games
+      - Sports
+  - name: Gifts
+    color: "FFD700"       # Gold
+    emoji: "🎁"
+    subcategories:
+      - Flowers
+      - Birthday Presents
+      - Xmas Presents
+  - name: Holidays
+    emoji: "✈️"
+    color: "87CEFA"       # Light sky blue — travel
+    subcategories:
+      - Flights
+      - Hotels
+      - Holiday Activities
+      - Holiday Food/Drinks
+
+
+data_dir: "/path/to/data/"
+archive_folder: "archive_folder_name"
+csv_output: "expense_tracker.csv"
+excel_output: "expense_tracker.xlsx"

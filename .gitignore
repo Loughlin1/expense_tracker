@@ -5,3 +5,7 @@
 **/config.yaml
 **/personal_rules.yaml
 **/categorisation_rules.py
+**/xlsxwriter/
+**/models/
+**/ai_categorisation.py
+prompts.yaml
